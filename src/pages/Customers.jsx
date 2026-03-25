@@ -76,45 +76,32 @@ export function Customers() {
   });
 
   // Safe getTierElement
+  // ✅ Simple Fix - Sirf API se jo string aa raha hai, wohi dikhaye
   const getTierElement = (customer) => {
-    let tierName = "Bronze";
+    const membership = customer?.activeMembership;
 
-    if (customer?.activeSubscription?.planName) {
-      tierName = customer.activeSubscription.planName;
-    } else if (customer?.membership) {
-      tierName = customer.membership;
+    if (!membership) {
+      return (
+        <div className="flex items-center gap-1.5 text-gray-500">
+          <Truck className="h-4 w-4" />
+          <span className="font-medium text-sm">No Membership</span>
+        </div>
+      );
     }
 
-    const name = tierName.toLowerCase();
-
-    let Icon = Truck;
+    // Simple color logic based on keyword (optional)
     let colorClass = 'text-indigo-600';
-
-    if (name.includes('premium') || name.includes('30 days')) {
-      Icon = Crown;
+    if (membership.toLowerCase().includes('premium')) {
       colorClass = 'text-violet-600';
-    } else if (name.includes('platinum')) {
-      Icon = Crown;
+    } else if (membership.toLowerCase().includes('platinum')) {
       colorClass = 'text-slate-700';
-    } else if (name.includes('gold')) {
-      Icon = Crown;
-      colorClass = 'text-yellow-600';
-    } else if (name.includes('silver')) {
-      Icon = Star;
-      colorClass = 'text-gray-500';
-    } else if (name.includes('bronze')) {
-      Icon = Percent;
-      colorClass = 'text-amber-700';
-    } else if (name.includes('diamond')) {
-      Icon = Diamond;
-      colorClass = 'text-indigo-700';
     }
 
     return (
       <div className="flex items-center gap-1.5">
-        <Icon className={`h-4 w-4 ${colorClass}`} />
+        <Crown className={`h-4 w-4 ${colorClass}`} />   {/* Crown for all premium plans */}
         <span className={`font-medium text-sm ${colorClass}`}>
-          {tierName}
+          {membership}   {/* ← Yeh exact API string dikhayega */}
         </span>
       </div>
     );
@@ -345,7 +332,7 @@ export function Customers() {
               <th className="px-6 py-3 text-left font-medium">Membership</th>
               <th className="px-6 py-3 text-left font-medium">Orders</th>
               <th className="px-6 py-3 text-left font-medium">Total Spend</th>
-              <th className="px-6 py-3 text-left font-medium">Last Order</th>
+              <th className="px-6 py-3 text-left font-medium">priority</th>
               <th className="px-6 py-3 text-left font-medium">Status</th>
               <th className="px-6 py-3 text-right font-medium">Actions</th>
             </tr>
@@ -396,7 +383,7 @@ export function Customers() {
                   </td>
 
                   <td className="px-6 py-2">
-                    {getTierElement(customer.membership)}
+                    {getTierElement(customer)}
                   </td>
 
                   <td className="px-6 py-2 font-medium">{customer.totalOrders || 0}</td>
@@ -406,16 +393,15 @@ export function Customers() {
                   </td>
 
                   <td className="px-6 py-2 text-gray-600">
-                    {customer.lastOrderDate || "N/A"}
+                    {customer.priority || "N/A"}
                   </td>
 
                   <td className="px-6 py-2">
                     <span
-                      className={`inline-flex px-3 py-1 text-xs font-medium rounded-3xl ${
-                        customer.isEnabled
+                      className={`inline-flex px-3 py-1 text-xs font-medium rounded-3xl ${customer.isEnabled
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-red-100 text-red-700'
-                      }`}
+                        }`}
                     >
                       {customer.isEnabled ? 'Active' : 'Inactive'}
                     </span>
