@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingCart, Package, Users, UserCog, 
   Wallet, Crown, Layout, Settings, LogOut, 
-  HelpCircle, FolderOpen, BarChart3, Bell
+  HelpCircle, FolderOpen, BarChart3, Bell,Ticket
 } from 'lucide-react';
 
 const MENU_ITEMS = [
@@ -17,10 +17,11 @@ const MENU_ITEMS = [
   { icon: Users, label: 'Customers', id: 'customers', permission: 'customers' },
   { icon: Wallet, label: 'Wallet', id: 'wallet', permission: 'wallet' },
   { icon: Crown, label: 'Membership', id: 'membership', permission: 'membership' },
-  { icon: BarChart3, label: 'Reports', id: 'reports', permission: 'reports' },
-  { icon: Layout, label: 'Home Page', id: 'home-page', permission: 'homepage' },
-  { icon: Bell, label: 'Push Notifications', id: 'notifications', permission: 'notifications' },
-  { icon: Settings, label: 'Settings', id: 'settings' },
+  // { icon: BarChart3, label: 'Reports', id: 'reports', permission: 'reports' },
+  // { icon: Layout, label: 'Home Page', id: 'home-page', permission: 'homepage' },
+  // { icon: Bell, label: 'Push Notifications', id: 'notifications', permission: 'notifications' },
+  // { icon: Settings, label: 'Settings', id: 'settings' },
+  { icon: Ticket, label: 'Tickets', id: 'tickets' },
   { icon: HelpCircle, label: 'Help & Support', id: 'help-support' },
 ];
 
@@ -44,17 +45,14 @@ export function Sidebar({ currentPage, onPageChange, onLogout, userRole = "Admin
 
   // Working Logout Handler
   const handleLogout = () => {
-    // Clear authentication data (adjust keys as per your app)
     localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('token');           // if you store JWT or similar
-    localStorage.removeItem('user');            // if you store user data
+    localStorage.removeItem('token');           
+    localStorage.removeItem('user');           
 
-    // Call parent logout handler (if passed)
     if (onLogout) {
       onLogout();
     }
 
-    // Redirect to login page
     navigate('/login', { replace: true });
   };
 

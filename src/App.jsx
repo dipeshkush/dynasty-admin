@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useState } from 'react';
 import {
   BrowserRouter as Router,
@@ -9,6 +8,7 @@ import {
 import './index.css';
 import './App.css';
 import { Login } from './pages/Login';
+import { ForgotPassword } from './pages/ForgotPassword';
 import { Dashboard } from './pages/Dashboard';
 import { MainLayout } from './components/layout/MainLayout';
 import { UserManagement } from './pages/UserManagement';
@@ -16,6 +16,7 @@ import { Products } from './pages/Products';
 import { CategoryManagement } from './pages/CategoryManagement';
 import { Orders } from './pages/Orders';
 import { Customers } from './pages/Customers';
+import { CustomerDetailsPage } from './pages/CustomerDetailsPage';
 import { Wallet } from './pages/Wallet';
 import { Membership } from './pages/Membership';
 import { Reports } from './pages/Reports';
@@ -24,13 +25,13 @@ import { PushNotifications } from './pages/PushNotifications';
 import { Settings } from './pages/Settings';
 import { HelpSupport } from './pages/HelpSupport';
 import { Profile } from './pages/Profile';
+import { WalletDetail } from './pages/WalletDetail';
+import Tickets from './pages/Tickets';
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Check localStorage on initial mount
     return localStorage.getItem('isAuthenticated') === 'true';
   });
-
   const login = () => {
     localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
@@ -67,8 +68,12 @@ function App() {
             )
           }
         />
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
 
-        {/* Protected: All pages inside MainLayout */}
+
         <Route
           element={
             <ProtectedRoute>
@@ -83,14 +88,18 @@ function App() {
           <Route path="/category-management" element={<CategoryManagement />} />
           <Route path="/Orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/wallet" element={<Wallet />} />
+          <Route path="/wallets/:customerId" element={<WalletDetail />} />
           <Route path="/membership" element={<Membership />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/home-page" element={<HomePageManagement />} />
           <Route path="/notifications" element={<PushNotifications />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/tickets" element={<Tickets />} />
           <Route path="/help-support" element={<HelpSupport />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/tickets" element={<Tickets />}/>
 
           {/* 404 */}
           <Route path="*" element={

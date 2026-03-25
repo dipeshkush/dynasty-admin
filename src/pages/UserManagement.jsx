@@ -10,27 +10,40 @@ import {
   RefreshCw,
   Download,
   ChevronDown,
+  X,
 } from "lucide-react";
 import { AddUserModal } from "../components/model/AddUserModal";
+import { useGetAdminsQuery, useDeleteAdminMutation } from "../services/authApi";
 
 export function UserManagement() {
   const [search, setSearch] = useState("");
   const [selectedRole, setSelectedRole] = useState("All Roles");
   const [selectedModule, setSelectedModule] = useState("All Modules");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState(null);
 
-  // Dummy users data
-  const [users, setUsers] = useState([
-    { id: 1, name: "Akash Yadav", email: "akash@gmail.com", role: "PanelUser", phone: "9123456780" },
-    { id: 2, name: "Akhilesh Yadav", email: "akhileshyadav12@gmail.com", role: "PanelUser", phone: "7081333616" },
-    { id: 3, name: "Amit Kumar", email: "amitkumart12@gmail.com", role: "PanelUser", phone: "8782282833" },
-    { id: 4, name: "Amit Verma", email: "amitverma@gmail.com", role: "PanelUser", phone: "9123456789" },
-    { id: 5, name: "Amit Yadav", email: "ujjawalkeshri2017@gmail.com", role: "PanelUser", phone: "09532775226" },
-    { id: 6, name: "Mohan Singh", email: "mohan.stock@dynasty.com", role: "PanelUser", phone: "9876543202" },
-    { id: 7, name: "Rajesh Kumar", email: "rajesh@dynasty.com", role: "Admin", phone: "9876543210" },
-  ]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
-  // Filtered users
+  const { data, isLoading, refetch } = useGetAdminsQuery();
+  const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
+
+  const users = useMemo(() => {
+    if (!data?.admins) return [];
+
+    return data.admins.map((admin) => ({
+      id: admin._id,
+      name: `${admin.firstName} ${admin.lastName || ""}`.trim(),
+      email: admin.email,
+      role: admin.role || "PanelUser",
+      phone: admin.phoneNumber || "-",
+      modules: admin.modules || [],
+      firstName: admin.firstName || "",
+      lastName: admin.lastName || "",
+      phoneNumber: admin.phoneNumber || "",
+    }));
+  }, [data]);
+
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const matchesSearch =
@@ -41,20 +54,55 @@ export function UserManagement() {
       const matchesRole =
         selectedRole === "All Roles" || user.role === selectedRole;
 
-      return matchesSearch && matchesRole;
-    });
-  }, [search, selectedRole, users]);
+      const matchesModule =
+        selectedModule === "All Modules" ||
+        (user.modules || []).some((m) =>
+          m.toLowerCase().includes(selectedModule.toLowerCase())
+        );
 
-  // Refresh button - simulates reload
-  const handleRefresh = () => {
-    // In real app: fetch from API again
-    alert("Refreshing user list... (dummy)");
-    // Optional: reset filters or re-fetch dummy data
-    setSearch("");
-    setSelectedRole("All Roles");
+      return matchesSearch && matchesRole && matchesModule;
+    });
+  }, [search, selectedRole, selectedModule, users]);
+
+  const handleAddUser = () => {
+    setSelectedUserForEdit(null);
+    setIsModalOpen(true);
   };
 
-  // Export button - downloads CSV
+  const handleEditUser = (user) => {
+    setSelectedUserForEdit(user);
+    setIsModalOpen(true);
+  };
+
+  const openDeleteModal = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await deleteAdmin(userToDelete.id).unwrap();
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+      // List auto-refreshes via invalidatesTags in RTK Query
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert(err?.data?.message || "Failed to delete admin. Please try again.");
+    }
+  };
+
+  const handleModalChange = (open) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setSelectedUserForEdit(null);
+      refetch(); // fallback refresh
+    }
+  };
+
+  const handleRefresh = () => refetch();
+
   const handleExport = () => {
     if (filteredUsers.length === 0) {
       alert("No users to export");
@@ -66,7 +114,7 @@ export function UserManagement() {
       headers.join(","),
       ...filteredUsers.map((user) =>
         [user.name, user.email, user.role, user.phone]
-          .map((val) => `"${val}"`)
+          .map((val) => `"${val?.toString().replace(/"/g, '""') || ""}"`)
           .join(",")
       ),
     ];
@@ -76,23 +124,11 @@ export function UserManagement() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "users_export.csv");
+    link.download = `users_export_${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    alert("Users exported as CSV!");
-  };
-
-  // Add user - open modal
-  const handleAddUser = () => {
-    setIsAddModalOpen(true);
-  };
-
-  // Save new user from modal
-  const handleSaveUser = (newUser) => {
-    const newId = Math.max(...users.map(u => u.id), 0) + 1;
-    setUsers([...users, { id: newId, ...newUser }]);
-    alert("New user added! (dummy save)");
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -150,7 +186,7 @@ export function UserManagement() {
             <div>
               <p className="text-sm text-gray-600">Admin Users</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
-                {users.filter(u => u.role === "Admin").length}
+                {users.filter((u) => u.role === "Admin").length}
               </p>
             </div>
             <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -175,10 +211,7 @@ export function UserManagement() {
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[220px]">
-          <Search
-            size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search users..."
@@ -188,7 +221,6 @@ export function UserManagement() {
           />
         </div>
 
-        {/* Role Dropdown */}
         <div className="relative min-w-[160px]">
           <select
             value={selectedRole}
@@ -202,7 +234,6 @@ export function UserManagement() {
           <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
         </div>
 
-        {/* Module Dropdown */}
         <div className="relative min-w-[180px]">
           <select
             value={selectedModule}
@@ -235,7 +266,13 @@ export function UserManagement() {
           </thead>
 
           <tbody className="divide-y divide-gray-100">
-            {filteredUsers.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-12 text-gray-500">
+                  Loading users...
+                </td>
+              </tr>
+            ) : filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-12 text-gray-500">
                   No users found
@@ -244,21 +281,37 @@ export function UserManagement() {
             ) : (
               filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-2 font-medium text-gray-900">{user.name}</td>
-                  <td className="px-6 py-2 text-gray-600">{user.email}</td>
-                  <td className="px-6 py-2">
+                  <td className="px-6 py-3 font-medium text-gray-900">{user.name}</td>
+                  <td className="px-6 py-3 text-gray-600">{user.email}</td>
+                  <td className="px-6 py-3">
                     <span className="inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-2 text-gray-600">{user.phone}</td>
-                  <td className="px-6 py-2 text-right">
+                  <td className="px-6 py-3 text-gray-600">{user.phone}</td>
+                  <td className="px-6 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                        <Edit2 size={14} className="text-gray-600" />
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="p-1.5 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="Edit user"
+                      >
+                        <Edit2 size={14} className="text-indigo-600" />
                       </button>
-                      <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                        <Trash2 size={14} className="text-red-500" />
+
+                      <button
+                        onClick={() => openDeleteModal(user)}
+                        disabled={isDeleting}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          isDeleting ? "opacity-50 cursor-not-allowed" : "hover:bg-red-50"
+                        }`}
+                        title="Delete user"
+                      >
+                        {isDeleting ? (
+                          <RefreshCw size={14} className="animate-spin text-red-500" />
+                        ) : (
+                          <Trash2 size={14} className="text-red-500" />
+                        )}
                       </button>
                     </div>
                   </td>
@@ -269,12 +322,82 @@ export function UserManagement() {
         </table>
       </div>
 
-      {/* Add User Modal */}
+      {/* Add / Edit Modal */}
       <AddUserModal
-        open={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-        onSave={handleSaveUser}
+        open={isModalOpen}
+        onOpenChange={handleModalChange}
+        editData={selectedUserForEdit}
       />
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && userToDelete && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setIsDeleteModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-6 py-5 border-b bg-red-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Trash2 className="h-6 w-6 text-red-600" />
+                <h3 className="text-lg font-semibold text-red-800">Delete Confirmation</h3>
+              </div>
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to permanently delete this admin?
+              </p>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                <p className="font-medium text-gray-900">{userToDelete.name}</p>
+                <p className="text-sm text-gray-600">{userToDelete.email}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Role: {userToDelete.role}
+                </p>
+              </div>
+              <p className="text-sm text-red-600 font-medium">
+                This action cannot be undone.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition shadow-sm disabled:opacity-60 flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw size={16} className="animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Yes, Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

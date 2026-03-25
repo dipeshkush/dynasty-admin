@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Shield, BarChart3, Palette, Rocket, Link2, Cloud } from "lucide-react";
-import webseederLogo from "/logo.png"; 
+import webseederLogo from "/logo.png";
+import { useLoginMutation } from "../services/authApi";
+import { useNavigate } from "react-router-dom";
+
 const slidesData = [
   {
     image: "/slide1.png",
@@ -33,7 +36,7 @@ const slidesData = [
   },
 ];
 
-export function Login({ onLoginSuccess }) {  
+export function Login({ onLoginSuccess }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -41,6 +44,11 @@ export function Login({ onLoginSuccess }) {
   });
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,12 +67,29 @@ export function Login({ onLoginSuccess }) {
     }));
   };
 
-  // Dummy Login – button click karte hi dashboard par jaayega
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Koi bhi validation nahi — direct success
-    if (onLoginSuccess) {
-      onLoginSuccess(); // Yeh App.jsx mein auth set karega aur redirect karega
+
+    setErrorMessage("");
+
+    if (!formData.email || !formData.password) {
+      setErrorMessage("Please enter email and password");
+      return;
+    }
+
+    try {
+      const res = await login({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap();
+
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("isAuthenticated", "true");
+
+      navigate("/dashboard", { replace: true });
+
+    } catch (error) {
+      setErrorMessage(error?.data?.message || "Invalid credentials");
     }
   };
 
@@ -75,9 +100,8 @@ export function Login({ onLoginSuccess }) {
         {slidesData.map((slide, idx) => (
           <div
             key={idx}
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
-              idx === currentSlideIndex ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${idx === currentSlideIndex ? "opacity-100" : "opacity-0"
+              }`}
             style={{ backgroundImage: `url(${slide.image})` }}
           />
         ))}
@@ -127,6 +151,14 @@ export function Login({ onLoginSuccess }) {
             </p>
           </div>
 
+          {errorMessage && (
+            <div className="px-8 pt-4">
+              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md py-2 text-center">
+                {errorMessage}
+              </div>
+            </div>
+          )}
+
           <div className="p-8 space-y-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
@@ -148,15 +180,26 @@ export function Login({ onLoginSuccess }) {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
-                />
+
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between">
@@ -173,9 +216,9 @@ export function Login({ onLoginSuccess }) {
                     Remember me
                   </label>
                 </div>
-
                 <button
                   type="button"
+                  onClick={() => navigate("/forgot-password")}
                   className="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
                 >
                   Forgot password?
@@ -184,9 +227,10 @@ export function Login({ onLoginSuccess }) {
 
               <button
                 type="submit"
-                className="w-full py-3 px-4 text-white font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all"
+                disabled={isLoading}
+                className="w-full py-3 px-4 text-white font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </button>
             </form>
 

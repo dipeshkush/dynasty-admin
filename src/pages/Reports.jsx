@@ -153,7 +153,7 @@ export function Reports() {
           <p className="text-sm text-gray-600 mt-1">Detailed insights into your business performance</p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        {/* <div className="flex flex-wrap gap-3">
           <button
             onClick={handleRefresh}
             className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
@@ -169,7 +169,7 @@ export function Reports() {
             <Download size={14} />
             Export
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Filter Controls */}
