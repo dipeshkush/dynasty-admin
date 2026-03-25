@@ -73,8 +73,8 @@ export function Dashboard() {
     try {
       const result = await triggerExport(dateRange).unwrap();
 
-      const blob = new Blob([result], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      const blob = new Blob([result], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -89,8 +89,8 @@ export function Dashboard() {
 
       alert("✅ Report downloaded successfully!");
     } catch (error) {
-      console.error("Export failed:", error);
-      alert("❌ Failed to export report. Please try again.");
+      console.error("Export Error Details:", error);
+      alert("❌ Failed to export report. Please check console (F12) for details.");
     } finally {
       setIsExporting(false);
     }
@@ -303,7 +303,7 @@ export function Dashboard() {
         {/* Top Products */}
         <div className="bg-white p-6 rounded-xl border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Selling Products</h3>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {productsLoading ? (
               <div className="text-center py-12 text-gray-500">Loading top products...</div>
             ) : topProducts.length > 0 ? (

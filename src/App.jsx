@@ -15,6 +15,7 @@ import { UserManagement } from './pages/UserManagement';
 import { Products } from './pages/Products';
 import { CategoryManagement } from './pages/CategoryManagement';
 import { Orders } from './pages/Orders';
+import  OrderDetail  from './pages/OrderDetail';
 import { Customers } from './pages/Customers';
 import { CustomerDetailsPage } from './pages/CustomerDetailsPage';
 import { Wallet } from './pages/Wallet';
@@ -87,6 +88,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/category-management" element={<CategoryManagement />} />
           <Route path="/Orders" element={<Orders />} />
+          <Route path="/admin/order/:orderId" element={<OrderDetail />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
           <Route path="/wallet" element={<Wallet />} />

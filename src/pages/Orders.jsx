@@ -1,6 +1,7 @@
 // src/pages/Orders.jsx
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";   // ← Added this line
 import {
   Search,
   ChevronDown,
@@ -17,6 +18,8 @@ import {
 import { useGetAllOrdersQuery, useUpdateOrderStatusMutation, useLazyExportOrdersQuery } from "../services/ordersApi";
 
 export function Orders() {
+  const navigate = useNavigate();   // ← Added this line
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
@@ -91,6 +94,7 @@ export function Orders() {
       alert("Failed to update status: " + (err?.data?.message || err?.message || "Unknown error"));
     }
   };
+
   const [triggerExport, { isFetching: isExporting }] = useLazyExportOrdersQuery();
 
   const handleExport = async () => {
@@ -266,7 +270,7 @@ export function Orders() {
                     #{order.orderNumber || order._id?.slice(-8)}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
                         {order.customer?.firstName?.[0]?.toUpperCase() || "U"}
@@ -278,17 +282,17 @@ export function Orders() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600 max-w-[180px] truncate" title={order.address?.flat + ", " + order.address?.area}>
+                  <td className="px-6 py-2 text-gray-600 max-w-[180px] truncate" title={order.address?.flat + ", " + order.address?.area}>
                     {order.address?.flat + ", " + order.address?.area + ", " + order.address?.city || "—"}
                   </td>
 
-                  <td className="px-6 py-4 text-center">{order.items?.length || 1}</td>
+                  <td className="px-6 py-2 text-center">{order.items?.length || 1}</td>
 
-                  <td className="px-6 py-4 font-semibold text-indigo-700">
+                  <td className="px-6 py-2 font-semibold text-indigo-700">
                     ₹{(order.finalAmount || order.totalAmount || 0).toLocaleString()}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">
                     <div className="flex flex-col gap-1">
                       <span className="text-xs text-gray-600">{order.paymentMethod || "COD"}</span>
                       <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full border ${getPaymentBadge(order.paymentMethod, order.paymentStatus)}`}>
@@ -297,7 +301,7 @@ export function Orders() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-6 py-2 text-gray-600">
                     {order.createdAt
                       ? new Date(order.createdAt).toLocaleDateString("en-IN", {
                         day: "numeric",
@@ -307,7 +311,7 @@ export function Orders() {
                       : "—"}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">
                     <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full border ${getStatusBadge(order.orderStatus)}`}>
                       {order.orderStatus || "Placed"}
                     </span>
@@ -334,14 +338,20 @@ export function Orders() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-2 text-right">
                     <div className="flex justify-end gap-2">
-                      {/* <button className="p-2 hover:bg-indigo-50 rounded-lg transition-colors" title="View Details">
+                      {/* View Details Button - Added only this part */}
+                      <button 
+                        onClick={() => navigate(`/admin/order/${order._id}`)}
+                        className="p-2 hover:bg-indigo-50 rounded-lg transition-colors" 
+                        title="View Details"
+                      >
                         <Eye size={16} className="text-indigo-600" />
-                      </button> */}
-                      <button className="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete Order">
-                        <Trash2 size={16} className="text-red-600" />
                       </button>
+
+                      {/* <button className="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete Order">
+                        <Trash2 size={16} className="text-red-600" />
+                      </button> */}
                     </div>
                   </td>
                 </tr>
@@ -352,4 +362,4 @@ export function Orders() {
       </div>
     </div>
   );
-}
+} 
