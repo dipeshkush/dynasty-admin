@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Check, UserPlus, X } from "lucide-react";
-import { useCreateAdminMutation, useUpdateAdminMutation } from "../../services/authApi"; // ← update mutation bhi add karo
+import { useCreateAdminMutation, useUpdateAdminMutation } from "../../services/authApi"; 
 
 const PANEL_PERMISSIONS = [
   "dashboard", "inventory", "orders", "delivery", "customers", "reports",
@@ -17,18 +17,16 @@ export function AddUserModal({ open, onOpenChange, editData = null }) {
     lastName: "",
     email: "",
     phone: "",
-    password: "", // edit mode mein password optional / blank rahega
+    password: "", 
     permissions: ["dashboard", "orders"],
   });
 
   const [errorMsg, setErrorMsg] = useState("");
 
   const [createAdmin, { isLoading: isCreating }] = useCreateAdminMutation();
-  const [updateAdmin, { isLoading: isUpdating }] = useUpdateAdminMutation(); // ← assume yeh hook bana hai
-
+  const [updateAdmin, { isLoading: isUpdating }] = useUpdateAdminMutation(); 
   const isLoading = isCreating || isUpdating;
 
-  // Form reset + pre-fill jab modal open ho
   useEffect(() => {
     if (open) {
       if (isEditMode) {
@@ -37,7 +35,7 @@ export function AddUserModal({ open, onOpenChange, editData = null }) {
           lastName: editData.lastName || "",
           email: editData.email || "",
           phone: editData.phoneNumber || editData.phone || "",
-          password: "", // security ke liye password pre-fill nahi karte
+          password: "", 
           permissions: editData.modules || editData.permissions || [],
         });
       } else {
@@ -112,10 +110,10 @@ export function AddUserModal({ open, onOpenChange, editData = null }) {
       modules: formData.permissions,
     };
 
-    console.log("=====================================");
-    console.log("MODE:", isEditMode ? "UPDATE" : "CREATE");
-    console.log("EDIT DATA ID:", editData?.id);                    
-    console.log("Payload before send:", JSON.stringify(payload, null, 2));
+    // console.log("=====================================");
+    // console.log("MODE:", isEditMode ? "UPDATE" : "CREATE");
+    // console.log("EDIT DATA ID:", editData?.id);                    
+    // console.log("Payload before send:", JSON.stringify(payload, null, 2));
 
     let result;
 

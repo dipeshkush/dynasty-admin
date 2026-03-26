@@ -83,9 +83,18 @@ export function Login({ onLoginSuccess }) {
         password: formData.password,
       }).unwrap();
 
+      // ✅ STORE TOKEN
       localStorage.setItem("token", res.token);
+
+      // ✅ STORE USER (IMPORTANT FOR RBAC)
+      localStorage.setItem("user", JSON.stringify(res.user));
+
+      // optional
       localStorage.setItem("isAuthenticated", "true");
 
+      console.log("LOGIN USER:", res.user);
+
+      // redirect
       navigate("/dashboard", { replace: true });
 
     } catch (error) {

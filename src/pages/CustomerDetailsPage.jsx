@@ -220,7 +220,6 @@ export function CustomerDetailsPage() {
                     {o.orderNumber}
                   </td>
 
-                  {/* Status - Pill Style (jaise screenshot mein Role hai) */}
                   <td className="py-2 px-6">
                     <span
                       className={`inline-flex items-center justify-center w-28 h-8 

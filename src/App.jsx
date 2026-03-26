@@ -15,7 +15,7 @@ import { UserManagement } from './pages/UserManagement';
 import { Products } from './pages/Products';
 import { CategoryManagement } from './pages/CategoryManagement';
 import { Orders } from './pages/Orders';
-import  OrderDetail  from './pages/OrderDetail';
+import OrderDetail from './pages/OrderDetail';
 import { Customers } from './pages/Customers';
 import { CustomerDetailsPage } from './pages/CustomerDetailsPage';
 import { Wallet } from './pages/Wallet';
@@ -31,15 +31,20 @@ import Tickets from './pages/Tickets';
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    return !!token && !!user; 
   });
+
   const login = () => {
-    localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsAuthenticated(false);
   };
 
@@ -87,7 +92,7 @@ function App() {
           <Route path="/user-management" element={<UserManagement />} />
           <Route path="/products" element={<Products />} />
           <Route path="/category-management" element={<CategoryManagement />} />
-          <Route path="/Orders" element={<Orders />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/admin/order/:orderId" element={<OrderDetail />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetailsPage />} />
@@ -101,7 +106,7 @@ function App() {
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/help-support" element={<HelpSupport />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/tickets" element={<Tickets />}/>
+          <Route path="/tickets" element={<Tickets />} />
 
           {/* 404 */}
           <Route path="*" element={

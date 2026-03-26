@@ -25,7 +25,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Dummy data (replace with real API data later)
+// Dummy data 
 const dummyStats = {
   totalOrders: 1245,
   totalRevenue: 458900,

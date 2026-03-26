@@ -1,6 +1,6 @@
 // src/components/layout/MainLayout.jsx
 import { useState } from 'react';
-import { Sidebar } from './Sidebar';   // adjust path if needed
+import { Sidebar } from './Sidebar';   
 import { Header } from './Header';
 import { Outlet } from "react-router-dom";
 

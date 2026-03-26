@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { CreateNotificationModal } from "../components/model/CreateNotificationModal";
 
-// Dummy data (replace with real API data later)
+// Dummy data
 const dummyStats = {
   totalSent: 1245,
   scheduled: 87,

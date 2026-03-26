@@ -31,7 +31,7 @@ export const productApi = apiSlice.injectEndpoints({
    toggleProductExclusive: builder.mutation({
   query: ({ id, isExclusive }) => ({
     url: `/api/admin/product/${id}/exclusive`,
-    method: "PUT", // ✅ FINAL FIX
+    method: "PUT",
     body: { isExclusive },
   }),
   invalidatesTags: (result, error, { id }) => [

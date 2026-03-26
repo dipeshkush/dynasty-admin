@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingCart, Package, Users, UserCog, 
   Wallet, Crown, Layout, Settings, LogOut, 
-  HelpCircle, FolderOpen, BarChart3, Bell,Ticket
+  HelpCircle, FolderOpen, BarChart3, Bell, Ticket
 } from 'lucide-react';
 
 const MENU_ITEMS = [
@@ -21,27 +21,34 @@ const MENU_ITEMS = [
   // { icon: Layout, label: 'Home Page', id: 'home-page', permission: 'homepage' },
   // { icon: Bell, label: 'Push Notifications', id: 'notifications', permission: 'notifications' },
   // { icon: Settings, label: 'Settings', id: 'settings' },
-  { icon: Ticket, label: 'Tickets', id: 'tickets' },
-  { icon: HelpCircle, label: 'Help & Support', id: 'help-support' },
+  { icon: Ticket, label: 'Tickets', id: 'tickets', permission: 'tickets' },
+  { icon: HelpCircle, label: 'Help & Support', id: 'help-support', permission: 'support' },
 ];
 
-export function Sidebar({ currentPage, onPageChange, onLogout, userRole = "Admin", currentUser }) {
+export function Sidebar({ currentPage, onPageChange, onLogout, userRole = "Admin" }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const filteredItems = useMemo(() => {
-    const userPerms = currentUser?.permissions || [];
-    const role = (userRole || '').toLowerCase();
-    const isAdmin = role === 'admin' || role === 'super admin';
+  // ✅ GET USER FROM LOCAL STORAGE
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const modules = user?.modules || [];
 
+  // ✅ RBAC FILTER
+  const filteredItems = useMemo(() => {
     return MENU_ITEMS.filter(item => {
-      if (isAdmin) return true;
+
+      // ✅ Super Admin → ALL ACCESS
+      if (modules.includes("all")) return true;
+
+      // ✅ No permission → always show
       if (!item.permission) return true;
-      return userPerms.includes(item.permission);
+
+      // ✅ Check module access
+      return modules.includes(item.permission);
     });
-  }, [currentUser, userRole]);
+  }, [modules]);
 
   // Working Logout Handler
   const handleLogout = () => {

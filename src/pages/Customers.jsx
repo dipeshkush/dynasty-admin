@@ -75,8 +75,6 @@ export function Customers() {
     return matchesSearch && matchesStatus && matchesMembership;
   });
 
-  // Safe getTierElement
-  // ✅ Simple Fix - Sirf API se jo string aa raha hai, wohi dikhaye
   const getTierElement = (customer) => {
     const membership = customer?.activeMembership;
 
@@ -99,9 +97,9 @@ export function Customers() {
 
     return (
       <div className="flex items-center gap-1.5">
-        <Crown className={`h-4 w-4 ${colorClass}`} />   {/* Crown for all premium plans */}
+        <Crown className={`h-4 w-4 ${colorClass}`} />  
         <span className={`font-medium text-sm ${colorClass}`}>
-          {membership}   {/* ← Yeh exact API string dikhayega */}
+          {membership} 
         </span>
       </div>
     );

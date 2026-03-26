@@ -379,10 +379,6 @@ export function HomePageManagement() {
         </div>
       </div>
 
-      {/* ──────────────────────────────────────────────── */}
-      {/* MODALS (inline for now - can be extracted later) */}
-      {/* ──────────────────────────────────────────────── */}
-
       {/* Banner Settings Modal */}
       {showBannerSettings && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">

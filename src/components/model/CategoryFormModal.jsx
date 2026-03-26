@@ -18,7 +18,6 @@ export function CategoryFormModal({ open, onClose, onSubmit, initialData = null 
 
   const [loading, setLoading] = useState(false);
 
-  // IMPORTANT: Yeh useEffect initialData change hone par form ko reset karega
   useEffect(() => {
     if (open) {
       if (initialData) {
@@ -26,7 +25,7 @@ export function CategoryFormModal({ open, onClose, onSubmit, initialData = null 
         setFormData({
           name: initialData.name || "",
           displayName: initialData.displayName || initialData.name || "",
-          description: "", // agar API mein description aayega to add kar dena
+          description: "", 
           icon: initialData.icon || "",
           imageFile: null,
           imagePreview: initialData.image || "",
@@ -45,7 +44,7 @@ export function CategoryFormModal({ open, onClose, onSubmit, initialData = null 
         });
       }
     }
-  }, [open, initialData]); // Dependencies: modal open hone ya initialData change hone par run
+  }, [open, initialData]); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
