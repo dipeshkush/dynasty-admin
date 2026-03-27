@@ -17,7 +17,7 @@ const MENU_ITEMS = [
   { icon: Users, label: 'Customers', id: 'customers', permission: 'customers' },
   { icon: Wallet, label: 'Wallet', id: 'wallet', permission: 'wallet' },
   { icon: Crown, label: 'Membership', id: 'membership', permission: 'membership' },
-  // { icon: BarChart3, label: 'Reports', id: 'reports', permission: 'reports' },
+  { icon: BarChart3, label: 'Reports', id: 'reports', permission: 'reports' },
   // { icon: Layout, label: 'Home Page', id: 'home-page', permission: 'homepage' },
   // { icon: Bell, label: 'Push Notifications', id: 'notifications', permission: 'notifications' },
   // { icon: Settings, label: 'Settings', id: 'settings' },

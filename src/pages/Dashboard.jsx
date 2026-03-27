@@ -73,8 +73,8 @@ export function Dashboard() {
     try {
       const result = await triggerExport(dateRange).unwrap();
 
-      const blob = new Blob([result], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const blob = new Blob([result], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -213,19 +213,35 @@ export function Dashboard() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Revenue Trend</h3>
-              <p className="text-sm text-gray-600">Income vs Expenses (Last 7 Months)</p>
+              <p className="text-sm text-gray-600">Sales Reports</p>
             </div>
           </div>
+
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                <YAxis stroke="#6b7280" fontSize={12} />
+                <XAxis
+                  dataKey="month"
+                  stroke="#6b7280"
+                  fontSize={12}
+                />
+                <YAxis
+                  stroke="#6b7280"
+                  fontSize={12}
+                />
                 <Tooltip />
-                <Legend wrapperStyle={{ fontSize: '13px', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="expenses" stroke="#9ca3af" strokeWidth={2.5} name="Expenses" dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="income" stroke="#6366f1" strokeWidth={2.5} name="Income" dot={{ r: 4 }} />
+
+                {/* Sirf Income Line */}
+                <Line
+                  type="monotone"
+                  dataKey="income"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  name="Income"
+                  dot={{ r: 3, fill: "#6366f1" }}
+                  activeDot={{ r: 7 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>

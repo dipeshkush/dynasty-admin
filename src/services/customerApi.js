@@ -4,9 +4,11 @@ import { apiSlice } from "./apiSlice";
 export const customerApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
-    // ✅ Get All Customers (FIXED TAGGING)
+   // ✅ Get All Customers with Pagination
     getAllCustomers: builder.query({
-      query: () => "/api/admin/get-customers",
+      query: ({ page = 1, limit = 10 }) => 
+        `/api/admin/get-customers?page=${page}&limit=${limit}`,
+
       providesTags: (result) =>
         result?.customers
           ? [
